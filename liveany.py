@@ -10,12 +10,14 @@ import requests
 from websocket import create_connection, WebSocketTimeoutException
 from colorama import Fore
 
-LIVEANY_URL = 'http://60.199.193.88:6007/socket.io/'
-WS_URL = 'ws://60.199.193.88:6007/socket.io/?lang=zh-tw&platform=web&EIO=3&transport=websocket&sid={}'
+LIVEANY_URL = 'http://106.185.43.237:18090/socket.io/'
+WS_URL = 'ws://106.185.43.237:18090/socket.io/?lang=zh-tw&platform=web&EIO=3&transport=websocket&sid={}'
 
 first = None
 second = None
 is_disconnect = False
+
+
 
 
 def get_token():
@@ -39,7 +41,7 @@ def get_token():
     return data.get('sid')
 
 
-def bot(i):
+def bot(i,myfile):
     '''A bot that get and send messages.'''
     global first
     global second
@@ -98,12 +100,12 @@ def bot(i):
 
     # send hello to user
     ws.send('42["say","{}"]'.format('哈囉'))
-
     # get messages in infinity loop
     while True:
         # close connection if is_disconnect is true
         if is_disconnect:
             ws.close()
+            print("Disconnect", file=myfile)
             break
 
         # get message that we should send
@@ -111,11 +113,13 @@ def bot(i):
             # send message to user
             ws.send('42["say","%s"]' % (first))
             print(Fore.RED + '1:', first)
+            print('1:', first, file=myfile)
             first = None
         if i == '1' and second:
             # send message to user
             ws.send('42["say","%s"]' % (second))
             print(Fore.GREEN + '2:', second)
+            print('2:', second, file=myfile)
             second = None
 
         # if user hasn't sent more that three messages,
@@ -169,7 +173,8 @@ def bot(i):
 def main():
     # clear text color
     print(Fore.RESET)
-
+    file_name =str(int(round(time())))
+    myfile = open(file_name+'.log', 'a')
     global first
     first = None
     global second
@@ -180,15 +185,16 @@ def main():
     # create a pool
     pool = ThreadPool(2)
     # start first user
-    pool.apply_async(bot, '0')
+    pool.apply_async(bot, ('0',myfile))
     # start second user after one second,
     # so they won't match together
-    sleep(1)
-    pool.apply_async(bot, '1')
+    sleep(3)
+    pool.apply_async(bot, ('1',myfile))
 
     # close pool and wait for them to disconnect
     pool.close()
     pool.join()
+    myfile.close()
 
 if __name__ == '__main__':
     while True:
