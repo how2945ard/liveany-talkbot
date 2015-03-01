@@ -174,7 +174,7 @@ def main():
     # clear text color
     print(Fore.RESET)
     file_name =str(int(round(time())))
-    myfile = open(file_name+'.log', 'a')
+    myfile = open('logs/'+file_name+'.log', 'a')
     global first
     first = None
     global second
