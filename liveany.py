@@ -99,7 +99,7 @@ def bot(i,myfile):
     print(i, 'start')
 
     # send hello to user
-    ws.send('42["say","{}"]'.format('哈囉'))
+    # ws.send('42["say","{}"]'.format('哈囉'))
     # get messages in infinity loop
     while True:
         # close connection if is_disconnect is true
@@ -109,13 +109,13 @@ def bot(i,myfile):
             break
 
         # get message that we should send
-        if i == '0' and first:
+        if i == 0  and first:
             # send message to user
             ws.send('42["say","%s"]' % (first))
             print(Fore.RED + '1:', first)
             print('1:', first, file=myfile)
             first = None
-        if i == '1' and second:
+        if i == 1  and second:
             # send message to user
             ws.send('42["say","%s"]' % (second))
             print(Fore.GREEN + '2:', second)
@@ -153,15 +153,17 @@ def bot(i,myfile):
             # user sends us message
             m = re.search('42\["say","(.+?)"\]', message)
             if m:
-                if i == '0':
+                if i == 0 :
                     # update message for second
                     second = m.group(1)
-                elif i == '1':
+                elif i == 1 :
                     # update message for first
                     first = m.group(1)
                 # if message is 哈囉, add one to hi_count
                 if m.group(1) == '哈囉':
                     hi_count += 1
+                if "http" in m.group(1):
+                    print(m.group(1), file=image)
             msg_count += 1
         elif '42["close",null]' in message:
             # close connection
@@ -173,8 +175,10 @@ def bot(i,myfile):
 def main():
     # clear text color
     print(Fore.RESET)
-    file_name =str(int(round(time())))
-    myfile = open('logs/'+file_name+'.log', 'a')
+    # file_name =str(int(round(time())))
+    file_name = ""
+    myfile = open('logs/'+file_name+'conversation.log', 'a')
+    image = open('screenshots/'+file_name+'image.log', 'a')
     global first
     first = None
     global second
@@ -185,11 +189,11 @@ def main():
     # create a pool
     pool = ThreadPool(2)
     # start first user
-    pool.apply_async(bot, ('0',myfile))
+    pool.apply_async(bot, (0 ,myfile))
     # start second user after one second,
     # so they won't match together
     sleep(3)
-    pool.apply_async(bot, ('1',myfile))
+    pool.apply_async(bot, (1 ,myfile))
 
     # close pool and wait for them to disconnect
     pool.close()
