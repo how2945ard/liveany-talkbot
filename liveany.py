@@ -18,7 +18,7 @@ second = None
 is_disconnect = False
 
 
-
+# sdadaslndkfgjndnfjlafnsdnjfksadnjkflnkj
 
 def get_token():
     '''Get SID so we can get token and connect to websocket'''
